@@ -1,4 +1,11 @@
 ## Flare-FL
+
+### Abstract
+I present Flare-FL, a decentralized Federated Learning (FL) framework that uses the Flare chain and the Flare Data Connector to decentralize the training process with the objective of improving the security of the model and the privacy of the clients.
+
+In particular, the Flare Data Connector allows user to submit an `Attestation Request`, which is evaluated by the `Attestation Providers`. The providers validate the request and vote to approve or reject it. If the request is approved, the partial updates (weights) are stored on the Flare chain. The global model is updated with the new weights thanks to the `Model Updater` smart contract.
+
+Flare-FL allows to train a model across multiple clients, without sharing their data. The Flare chain is used to store the global model and the weights of the clients. The Flare Data Connector is used to store the data of the clients. The training process is divided into three phases: Collect, Choose, and Resolution. In the Collect phase, the client submits an Attestation Request to the Attestation Providers. In the Choose phase, the Attestation Providers choose which requests to accept. In the Resolution phase, the Attestation Providers evaluate the client's updated model and, if it is good enough, the new weights are stored on the Flare chain. The global model is updated with the new weights thanks to the Model Updater smart contract.
 Federated Learning allows to train a model across multiple clients, without sharing their data. However, classical FL has some limitations, such as the need for a central server to coordinate the training process. Flare-FL is a decentralized FL framework that uses the Flare chain and the Flare Data Connector to decentralize the training process.
 
 ### Repository Structure
@@ -39,10 +46,19 @@ pip install dist/*.whl
 ```
 
 ### Run the client
+The client allows to generate 
 
 ```console
 python 
+```
 
+### Install the frontend
+
+```console
+cd frontend
+yarn install # requires yarn
+yarn start
+```
 
 ## Flare Hardhat Starter Kit
 
@@ -95,8 +111,5 @@ If you are new to Hardhat please check the [Hardhat getting started doc](https:/
    npx hardhat run scripts/tryDeployment.ts
    ```
 
-## Resources
-
-- [Flare Developer Hub](https://dev.flare.network/)
-- [Hardhat Docs](https://hardhat.org/docs)
-
+#### TO DO
+- Refactor the server as there is duplicated code (`mlmodels`, `data` and `utils`).

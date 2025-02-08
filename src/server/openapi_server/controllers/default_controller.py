@@ -24,20 +24,13 @@ def validate_model_get(model, weights):  # noqa: E501
 
     :rtype: Union[ValidateModelGet200Response, Tuple[ValidateModelGet200Response, int], Tuple[ValidateModelGet200Response, int, Dict[str, str]]
     """
-    # Decode the weights from base64
-    #weights = b64decode(weights)
-    
-    # Save on /tmp/weights.h5 file
-    #with open('/tmp/test.weights.h5', 'wb') as f:
-    #    f.write(weights)
-    #Removed because 
-    
     _model = get_model(model)
     
-    _model.load_weights(weights) #Weights is a file path
+    # prepend ../ to weights
+    _model.load_weights("../"+weights) #Weights is a file path
     
     # Read the weights from the file as a base64 string
-    with open(weights, 'rb') as f:
+    with open("../"+weights, 'rb') as f:
         weights64 = encode_hex(f.read())
         #weights64 = "0x" + weights64.decode('utf-8')
 

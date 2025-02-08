@@ -11,37 +11,38 @@ import os
 parser = argparse.ArgumentParser(description='Train a model.')
 parser.add_argument('--data-path', type=str, default='data/cifar10/data_batch_1', help='Path to the training data')
 parser.add_argument('--validate', action='store_true', help='Validate the model after training')
+parser.add_argument('--train', action='store_true', help='Enable training (disabled because of the precomputed weights)')
 args = parser.parse_args()
-model = get_model()
 
-# Load the CIFAR-10 dataset
-features, labels = load_data('data/cifar10/data_batch_1')
+if not args.train and not args.validate:
+    print("Both training and validation are disabled, is it intended?")
 
-# Train the model
-model.fit(features, labels, epochs=1, batch_size=32)
+index = args.data_path[-1]
+weights_file = f'data/cifar10/precomputed/precomputed_{index}.weights.h5'
 
-# Load the test data
-test_features, test_labels = load_data('data/cifar10/test_batch')
+if args.train:
+    model = get_model()
 
-weights_file = 'data/cifar10/cifar10_weights.weights.h5'
+    # Load the CIFAR-10 dataset
+    features, labels = load_data(args.data_path)
 
-model.save_weights(weights_file)
+    # Train the model
+    model.fit(features, labels, epochs=1, batch_size=32)
+
+    # Save the weights
+    model.save_weights(weights_file)
 
 if args.validate:
     # Evaluate the model
     client = Client("http://localhost:8080")
     
-    # load the weights from the file and encode them in base64
-    #with open(weights_file, 'rb') as f:
-    #    weights = f.read()
-    
-    #Get the absolute path of the weights file
-    weights = os.path.abspath(weights_file) 
-     
-    response : Response = get_validate_model.sync_detailed(client=client, model=GetValidateModelModel.CIFAR10, weights=weights)
+    # To simulate, simply pass the name of the file in the precomputed folder     
+    response : Response = get_validate_model.sync_detailed(client=client, model=GetValidateModelModel.CIFAR10, weights=weights_file)
     
     if isinstance(response.parsed, GetValidateModelResponse200):
         if isinstance(response.parsed.error, Unset):
             print("Model validation successful")
         else:
             print("Model validation failed")
+    else:
+        print("Error:", response.status_code)
