@@ -7,26 +7,40 @@ servers:
 - url: /
 paths:
   /validate_model:
-    post:
-      operationId: validate_model_post
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/_validate_model_post_request'
+    get:
+      operationId: validate_model_get
+      parameters:
+      - description: The model architecture
+        explode: true
+        in: query
+        name: model
         required: true
+        schema:
+          enum:
+          - cifar10
+          type: string
+        style: form
+      - description: "The model weights (to overcome the limitation of GET request,\
+          \ this field will receive a file path for now)"
+        explode: true
+        in: query
+        name: weights
+        required: true
+        schema:
+          type: string
+        style: form
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/_validate_model_post_200_response'
+                $ref: '#/components/schemas/_validate_model_get_200_response'
           description: Validation result
       summary: Validate the model with provided weights
       x-openapi-router-controller: openapi_server.controllers.default_controller
 components:
   schemas:
-    _validate_model_post_200_response:
+    _validate_model_get_200_response:
       example:
         model: model
         weights: weights
@@ -43,23 +57,5 @@ components:
           nullable: true
           title: error
           type: string
-      title: _validate_model_post_200_response
-      type: object
-    _validate_model_post_request:
-      properties:
-        model:
-          description: The model architecture
-          enum:
-          - cifar10
-          title: model
-          type: string
-        weights:
-          description: The model weights as a base64 encoded string
-          format: base64
-          title: weights
-          type: string
-      required:
-      - model
-      - weights
-      title: _validate_model_post_request
+      title: _validate_model_get_200_response
       type: object

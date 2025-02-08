@@ -61,6 +61,9 @@ contract Models {
     }
 
     function createModel(string memory identifier, bytes memory weights) public {
+        // If the model already exists, do not allow it to be updated
+        require(bytes(models[identifier].identifier).length == 0, "Model already exists");
+
         Model memory model = Model({
             identifier: identifier,
             weights: weights
@@ -79,6 +82,7 @@ contract Models {
     }
 
     function getModel(string memory identifier) public view returns (Model memory) {
+        require(bytes(models[identifier].identifier).length > 0, "Model does not exist");
         return models[identifier];
     }
 
@@ -93,4 +97,8 @@ contract Models {
     {
         return ContractRegistry.getFdcRequestFeeConfigurations();
     }
+
+    function setDataTransportObject(DataTransportObject memory dto) public {
+    }
+    
 }

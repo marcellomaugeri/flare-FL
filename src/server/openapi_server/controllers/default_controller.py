@@ -3,48 +3,56 @@ from typing import Dict
 from typing import Tuple
 from typing import Union
 
-from openapi_server.models.validate_model_post200_response import ValidateModelPost200Response  # noqa: E501
-from openapi_server.models.validate_model_post_request import ValidateModelPostRequest  # noqa: E501
+from openapi_server.models.validate_model_get200_response import ValidateModelGet200Response  # noqa: E501
 from openapi_server import util
 
 from openapi_server.mlmodels import get_model
-from base64 import b64decode
+from base64 import b64encode
 from openapi_server.utils.cifar10_utils import load_data
+from eth_utils import encode_hex
 
-def validate_model_post(body):  # noqa: E501
+
+def validate_model_get(model, weights):  # noqa: E501
     """Validate the model with provided weights
 
      # noqa: E501
 
-    :param validate_model_post_request: 
-    :type validate_model_post_request: dict | bytes
+    :param model: The model architecture
+    :type model: str
+    :param weights: The model weights (to overcome the limitation of GET request, this field will receive a file path for now)
+    :type weights: str
 
-    :rtype: Union[ValidateModelPost200Response, Tuple[ValidateModelPost200Response, int], Tuple[ValidateModelPost200Response, int, Dict[str, str]]
+    :rtype: Union[ValidateModelGet200Response, Tuple[ValidateModelGet200Response, int], Tuple[ValidateModelGet200Response, int, Dict[str, str]]
     """
-    validate_model_post_request = body
-    if connexion.request.is_json:
-        validate_model_post_request = ValidateModelPostRequest.from_dict(connexion.request.get_json())  # noqa: E501
-    
-    model = get_model(validate_model_post_request.model)
-    weights = validate_model_post_request.weights
-    
     # Decode the weights from base64
-    weights = b64decode(weights)
+    #weights = b64decode(weights)
     
     # Save on /tmp/weights.h5 file
-    with open('/tmp/test.weights.h5', 'wb') as f:
-        f.write(weights)
+    #with open('/tmp/test.weights.h5', 'wb') as f:
+    #    f.write(weights)
+    #Removed because 
     
-    model.load_weights('/tmp/test.weights.h5')
+    _model = get_model(model)
     
+    _model.load_weights(weights) #Weights is a file path
+    
+    # Read the weights from the file as a base64 string
+    with open(weights, 'rb') as f:
+        weights64 = encode_hex(f.read())
+        #weights64 = "0x" + weights64.decode('utf-8')
+
+            
     # Load the test data
     test_features, test_labels = load_data('../data/cifar10/test_batch')
     
     # Evaluate the model
-    loss, accuracy = model.evaluate(test_features, test_labels)
+    loss, accuracy = _model.evaluate(test_features, test_labels)
+    
+    
     
     if accuracy > 0.1:
-        print("A posto mbare, menza parola")
-        return ValidateModelPost200Response(model=validate_model_post_request.model, weights=validate_model_post_request.weights, error=None)
+        return ValidateModelGet200Response(model=model, weights=weights64, error=None)
     else:
-        return ValidateModelPost200Response(model=validate_model_post_request.model, weights=validate_model_post_request.weights, error='Model accuracy is too low')
+        return ValidateModelGet200Response(model=model, weights=weights64, error='Model accuracy is too low')
+
+

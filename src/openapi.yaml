@@ -1,0 +1,39 @@
+openapi: 3.0.0
+info:
+  title: Model Validation API
+  version: 1.0.0
+  description: API for validating a model with provided weights
+paths:
+  /validate_model:
+    get:
+      summary: Validate the model with provided weights
+      parameters:
+        - in: query
+          name: model
+          schema:
+            type: string
+            enum: ["cifar10"]
+          required: true
+          description: The model architecture
+        - in: query
+          name: weights
+          schema:
+            type: string
+          required: true
+          description: The model weights (to overcome the limitation of GET request, this field will receive a file path for now)
+      responses:
+        "200":
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model:
+                    type: string
+                  weights:
+                    type: string
+                    format: base64
+                  error:
+                    type: string
+                    nullable: true

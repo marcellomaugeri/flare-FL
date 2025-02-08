@@ -1,6 +1,5 @@
 import sys
 from setuptools import setup, find_packages
-import os
 
 NAME = "openapi_server"
 VERSION = "1.0.0"
@@ -18,8 +17,6 @@ REQUIRES = [
     "python_dateutil>=2.6.0"
 ]
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # Go up two levels
-
 setup(
     name=NAME,
     version=VERSION,
@@ -28,7 +25,7 @@ setup(
     url="",
     keywords=["OpenAPI", "Model Validation API"],
     install_requires=REQUIRES,
-    packages=find_packages(where=BASE_DIR),
+    packages=find_packages(),
     package_data={'': ['openapi/openapi.yaml']},
     include_package_data=True,
     entry_points={
