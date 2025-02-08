@@ -1,4 +1,48 @@
-## If you are from the eth-global/encode hackathon https://github.com/flare-foundation/flare-hardhat-starter/tree/encode-hackathon is the branch you look for
+## Flare-FL
+Federated Learning allows to train a model across multiple clients, without sharing their data. However, classical FL has some limitations, such as the need for a central server to coordinate the training process. Flare-FL is a decentralized FL framework that uses the Flare chain and the Flare Data Connector to decentralize the training process.
+
+### Repository Structure
+
+TO DO
+
+### Workflow
+0. The client downloads the global model (weights) from the Flare chain.
+1. The client trains the model on its local data.
+2. [Collect Phase] The client submits an `Attestation Request` (and pays the fee) to 
+3. [Choose Phase] Each `Attestation Provider` chooses which requests to accept. In particular, the `Attestation Provider` call a remote API to evaluate the client's updated model.
+4. [Resolution Phase] If the `Attestation Provider` accepts the request, i.e. the client's model is good enough, the new weights are stored on the Flare chain.
+5. The global model is updated with the new weights thanks to the `Model Updater` smart contract.
+
+### User Workflow
+0. The client downloads the global model (weights) from the Flare chain.
+1. The client trains the model on its local data.
+2. The client submits an `Attestation Request` (and pays the fee).
+3. The client waits for the request to be accepted.
+4. Once the `Model Updater` smart contract updates the global model, the client can download the new weights.
+Repeat from step 1.
+
+### Run the Validator Server
+
+#### Install Python dependencies
+```console
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Install the client
+
+```console
+cd src/client_module
+poetry build -f wheel
+pip install dist/*.whl
+```
+
+### Run the client
+
+```console
+python 
+
 
 ## Flare Hardhat Starter Kit
 
@@ -12,19 +56,8 @@ If you are new to Hardhat please check the [Hardhat getting started doc](https:/
 1. Clone and install dependencies:
 
    ```console
-   git clone https://github.com/flare-foundation/flare-hardhat-starter.git
-   cd flare-hardhat-starter
-   ```
-
-   and then run:
-
-   ```console
-   yarn
-   ```
-
-   or
-
-   ```console
+   git clone https://github.com/marcellomaugeri/flare-FL
+   cd flare-FL
    npm install
    ```
 
@@ -36,13 +69,9 @@ If you are new to Hardhat please check the [Hardhat getting started doc](https:/
 
 3. Change the `PRIVATE_KEY` in the `.env` file to yours
 
+4. Change the `JQ_API_KEY` to `flare-oxford-2025` in the `.env` file
+
 4. Compile the project
-
-    ```console
-    yarn hardhat compile
-    ```
-
-    or
 
     ```console
     npx hardhat compile
@@ -51,12 +80,6 @@ If you are new to Hardhat please check the [Hardhat getting started doc](https:/
     This will compile all `.sol` files in your `/contracts` folder. It will also generate artifacts that will be needed for testing. Contracts `Imports.sol` import MockContracts and Flare related mocks, thus enabling mocking of the contracts from typescript.
 
 5. Run Tests
-
-    ```console
-    yarn hardhat test
-    ```
-
-    or
 
     ```console
     npx hardhat test

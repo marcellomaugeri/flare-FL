@@ -69,10 +69,10 @@ async function prepareRequest() {
 }
 
 
-// prepareRequest().then((data) => {
-//     console.log("Prepared request:", data);
-//     process.exit(0);
-// });
+//prepareRequest().then((data) => {
+//    console.log("Prepared request:", data);
+//    process.exit(0);
+//});
 
 const firstVotingRoundStartTs = 1658429955;
 const votingEpochDurationSeconds = 90;
@@ -105,10 +105,10 @@ async function submitRequest() {
     return roundId;
 }
 
-// submitRequest().then((data) => {
-//     console.log("Submitted request:", data);
-//     process.exit(0);
-// });
+submitRequest().then((data) => {
+    console.log("Submitted request:", data);
+    process.exit(0);
+});
 
 
 const TARGET_ROUND_ID = 892542; // 0

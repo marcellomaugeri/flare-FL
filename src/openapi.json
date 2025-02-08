@@ -1,0 +1,63 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Model Validation API",
+      "version": "1.0.0",
+      "description": "API for validating a model with provided weights"
+    },
+    "paths": {
+      "/validate_model": {
+        "post": {
+          "summary": "Validate the model with provided weights",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "model": {
+                      "type": "string",
+                      "description": "The model architecture",
+                      "enum": ["cifar10"]
+                    },
+                    "weights": {
+                      "type": "string",
+                      "format": "base64",
+                      "description": "The model weights as a base64 encoded string"
+                    }
+                  },
+                  "required": ["model", "weights"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Validation result",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "model": {
+                        "type": "string"
+                      },
+                      "weights": {
+                        "type": "string",
+                        "format": "base64"
+                      },
+                      "error": {
+                        "type": "string",
+                        "nullable": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }

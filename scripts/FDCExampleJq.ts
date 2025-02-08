@@ -117,10 +117,10 @@ async function submitRequest() {
     return roundId;
 }
 
-// submitRequest().then((data) => {
-//     console.log("Submitted request:", data);
-//     process.exit(0);
-// });
+submitRequest().then((data) => {
+    console.log("Submitted request:", data);
+    process.exit(0);
+});
 
 
 const TARGET_ROUND_ID = 894447; // 0

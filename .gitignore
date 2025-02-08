@@ -9,6 +9,8 @@ node_modules
 typechain-types
 
 .env
-
+dist/
+__pycache__/
 
 .DS_Store
+.venv/
