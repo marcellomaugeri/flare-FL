@@ -1,0 +1,23 @@
+{
+  "contractCall": [
+    "// Read more about useDapp on https://usedapp.io/",
+    "const { error: contractCallError, value: nextStreamId } =",
+    "  useCall({",
+    "     contract: new Contract(addresses[MAINNET_ID].sablier, abis.sablier),",
+    "     method: \"nextStreamId\",",
+    "     args: [],",
+    "  }) ?? {};"
+  ],
+  "imports": [
+    "import { MAINNET_ID, addresses, abis } from \"@sablier-v1-app/contracts\";",
+    "import GET_STREAMS from \"./graphql/subgraph\";"
+  ],
+  "learn": {
+    "name": "Sablier v1",
+    "url": "https://docs.sablier.finance/"
+  },
+  "subgraphQuery": {
+    "key": "streams",
+    "name": "GET_STREAMS"
+  }
+}

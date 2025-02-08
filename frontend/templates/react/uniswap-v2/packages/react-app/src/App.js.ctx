@@ -1,0 +1,23 @@
+{
+  "contractCall": [
+    "// Read more about useDapp on https://usedapp.io/",
+    "const { error: contractCallError, value: reserves } =",
+    "  useCall({",
+    "     contract: new Contract(addresses[MAINNET_ID].pairs[\"DAI-WETH\"], abis.pair),",
+    "     method: \"getReserves\",",
+    "     args: [],",
+    "  }) ?? {};"
+  ],
+  "imports": [
+    "import { MAINNET_ID, addresses, abis } from \"@uniswap-v2-app/contracts\";",
+    "import GET_AGGREGATED_UNISWAP_DATA from \"./graphql/subgraph\";"
+  ],
+  "learn": {
+    "name": "Uniswap v2",
+    "url": "https://uniswap.org/docs/v2/"
+  },
+  "subgraphQuery": {
+    "key": "uniswapFactories",
+    "name": "GET_AGGREGATED_UNISWAP_DATA"
+  }
+}

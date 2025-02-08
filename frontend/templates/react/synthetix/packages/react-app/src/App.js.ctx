@@ -1,0 +1,24 @@
+{
+  "contractCall": [
+    "// Read more about useDapp on https://usedapp.io/",
+    "const { error: contractCallError, value: tokenBalance } =",
+    "  useCall({",
+    "     contract: new Contract(addresses[MAINNET_ID].tokens.SNX, abis.tokens.SNX),",
+    "     method: \"balanceOf\",",
+    "     args: [\"0x49BE88F0fcC3A8393a59d3688480d7D253C37D2A\"],",
+    "  }) ?? {};"
+  ],
+  "imports": [
+    "import { MAINNET_ID, addresses, abis } from \"@synthetix-app/contracts\";",
+    "import { SynthetixJs } from \"synthetix-js\";",
+    "import GET_SYNTH_HOLDERS from \"./graphql/subgraph\";"
+  ],
+  "learn": {
+    "name": "Synthetix",
+    "url": "https://docs.synthetix.io/"
+  },
+  "subgraphQuery": {
+    "key": "synthHolders",
+    "name": "GET_SYNTH_HOLDERS"
+  }
+}

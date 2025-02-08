@@ -1,0 +1,11 @@
+{
+  "packageName": "@my-app/react-app",
+  "dependencies": {
+    "keys": [
+      "@my-app/contracts"
+    ],
+    "values": [
+      "^1.0.0"
+    ]
+  }
+}

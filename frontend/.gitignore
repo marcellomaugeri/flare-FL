@@ -1,0 +1,24 @@
+# generic folders
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+build/
+coverage/
+dist/
+node_modules/
+
+# generic files
+.DS_Store
+.env*
+.pnp*
+npm-debug.log*
+tsconfig.tsbuildinfo
+yarn.lock
+yarn-debug.log*
+yarn-error.log*
+*.log
+!/yarn.lock
+
+# templates
+templates/**/build/
+templates/**/src/types/

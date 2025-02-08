@@ -1,0 +1,23 @@
+{
+  "contractCall": [
+    "// Read more about useDapp on https://usedapp.io/",
+    "const { error: contractCallError, value: mUsdTotalSupply } =",
+    "  useCall({",
+    "     contract:new Contract(addresses[MAINNET_ID].tokens.mUSD, abis.mAsset),",
+    "     method: \"totalSupply\",",
+    "     args: [],",
+    "  }) ?? {};"
+  ],
+  "imports": [
+    "import { MAINNET_ID, addresses, abis } from \"@mstable-app/contracts\";",
+    "import GET_MASSETS from \"./graphql/subgraph\";"
+  ],
+  "learn": {
+    "name": "mStable",
+    "url": "https://docs.mstable.org/"
+  },
+  "subgraphQuery": {
+    "key": "massets",
+    "name": "GET_MASSETS"
+  }
+}

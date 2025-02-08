@@ -1,0 +1,5 @@
+{
+  "subgraph": {
+    "url": "https://api.thegraph.com/explorer/subgraph/protofire/kyber"
+  }
+}

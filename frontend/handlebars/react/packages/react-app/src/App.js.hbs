@@ -1,0 +1,88 @@
+import { useQuery } from "@apollo/client";
+import { Contract } from "@ethersproject/contracts";
+import { shortenAddress, useCall, useEthers, useLookupAddress } from "@usedapp/core";
+import React, { useEffect, useState } from "react";
+
+import { Body, Button, Container, Header, Image, Link } from "./components";
+import logo from "./ethereumLogo.png";
+
+{{#each imports}}
+{{{ this }}}
+{{/each}}
+
+function WalletButton() {
+  const [rendered, setRendered] = useState("");
+
+  const { ens } = useLookupAddress();
+  const { account, activateBrowserWallet, deactivate, error } = useEthers();
+
+  useEffect(() => {
+    if (ens) {
+      setRendered(ens);
+    } else if (account) {
+      setRendered(shortenAddress(account));
+    } else {
+      setRendered("");
+    }
+  }, [account, ens, setRendered]);
+
+  useEffect(() => {
+    if (error) {
+      console.error("Error while connecting wallet:", error.message);
+    }
+  }, [error]);
+
+  return (
+    <Button
+      onClick={() => {
+        if (!account) {
+          activateBrowserWallet();
+        } else {
+          deactivate();
+        }
+      }}
+    >
+      {rendered === "" && "Connect Wallet"}
+      {rendered !== "" && rendered}
+    </Button>
+  );
+}
+
+function App() {
+  {{#each contractCall }}
+  {{{ this }}}
+  {{/each}}
+
+  const { loading, error: subgraphQueryError, data } = useQuery({{ subgraphQuery.name }});
+
+  useEffect(() => {
+    if (subgraphQueryError) {
+      console.error("Error while querying subgraph:", subgraphQueryError.message);
+      return;
+    }
+    if (!loading && data && data.{{ subgraphQuery.key }}) {
+      console.log({ {{ subgraphQuery.key }}: data.{{ subgraphQuery.key }} });
+    }
+  }, [loading, subgraphQueryError, data]);
+
+  return (
+    <Container>
+      <Header>
+        <WalletButton />
+      </Header>
+      <Body>
+        <Image src={logo} alt="ethereum-logo" />
+        <p>
+          Edit <code>packages/react-app/src/App.js</code> and save to reload.
+        </p>
+        <Link href="https://reactjs.org">
+          Learn React
+        </Link>
+        <Link href="https://usedapp.io/">Learn useDapp</Link>
+        <Link href="{{ learn.url }}">Learn {{ learn.name }}</Link>
+      </Body>
+    </Container>
+  );
+}
+
+export default App;

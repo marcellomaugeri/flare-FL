@@ -1,0 +1,37 @@
+{
+  "callToAction": "Read On-Chain Data",
+  "contractCall": [
+    "// Should replace with the end-user wallet, e.g. Metamask",
+    "const defaultProvider = getDefaultProvider();",
+    "// Create an instance of an ethers.js Contract",
+    "// Read more about ethers.js on https://docs.ethers.io/v5/api/contract/contract/",
+    "const sablierContract = new Contract(addresses[MAINNET_ID].sablier, abis.sablier, defaultProvider);",
+    "const nextStreamId = await sablierContract.nextStreamId();",
+    "console.log({ nextStreamId: nextStreamId.toString() });"
+  ],
+  "imports": [
+    "import { MAINNET_ID, addresses, abis } from \"@sablier-v1-app/contracts\";",
+    "import GET_STREAMS from \"../graphql/subgraph\";"
+  ],
+  "learn": {
+    "items": [
+      {
+        "label": "Core Docs",
+        "url": "https://docs.sablier.finance/"
+      },
+      {
+        "label": "Community Chat",
+        "url": "https://discord.gg/KXajCXC/"
+      },
+      {
+        "label": "Twitter",
+        "url": "https://twitter.com/sablierhq/"
+      }
+    ],
+    "name": "Sablier v1"
+  },
+  "subgraphQuery": {
+    "key": "streams",
+    "name": "GET_STREAMS"
+  }
+}

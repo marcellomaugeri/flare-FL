@@ -1,0 +1,27 @@
+{
+  "contractCall": [
+    "// Read more about useDapp on https://usedapp.io/",
+    "const { error: contractCallError, value: exchangeRate } =",
+    "  useCall({",
+    "     contract: new Contract(addresses[MAINNET_ID].kyberNetworkProxyV2, abis.kyberNetworkProxyV2),",
+    "     method: \"getExpectedRate\",",
+    "     args: [",
+    "       \"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\",",
+    "       \"0x6B175474E89094C44Da98b954EedeAC495271d0F\",",
+    "       \"1000000000000000000\"",
+    "     ],",
+    "  }) ?? {};"
+  ],
+  "imports": [
+    "import { MAINNET_ID, addresses, abis } from \"@kyber-app/contracts\";",
+    "import GET_FULL_TRADES from \"./graphql/subgraph\";"
+  ],
+  "learn": {
+    "name": "Kyber",
+    "url": "https://developer.kyber.network/"
+  },
+  "subgraphQuery": {
+    "key": "fullTrades",
+    "name": "GET_FULL_TRADES"
+  }
+}
