@@ -25,6 +25,7 @@ struct DataTransportObject {
 
 contract Models {
     mapping(string => Model) public models;
+    string[] public modelIds;
 
     function isJsonApiProofValid(
         IJsonApi.Proof calldata _proof
@@ -44,49 +45,41 @@ contract Models {
             (DataTransportObject)
         );
 
-        require(models[dto.name].weights.length == 0, "Model already exists");
+        // Require error to be empty
+        require(bytes(dto.error).length == 0, "Error in data");
+
+        // TODO: Check if model already exists? Not sure if this is needed, the API already does it
+
+        // Perform the model update by storing the weights
 
         Model memory model = Model({
             identifier: dto.name,
-            weights: data.data.responseBody.abi_encoded_data
+            weights: dto.weights
         });
-
         models[dto.name] = model;
+        modelIds.push(dto.name);
     }
 
-    function addCharacter(IJsonApi.Proof calldata data) public {
-        require(isJsonApiProofValid(data), "Invalid proof");
-
-        DataTransportObject memory dto = abi.decode(
-            data.data.responseBody.abi_encoded_data,
-            (DataTransportObject)
-        );
-
-        require(characters[dto.apiUid].apiUid == 0, "Character already exists");
-
-        StarWarsCharacter memory character = StarWarsCharacter({
-            name: dto.name,
-            numberOfMovies: dto.numberOfMovies,
-            apiUid: dto.apiUid,
-            bmi: (dto.mass * 100 * 100) / (dto.height * dto.height)
+    function createModel(string memory identifier, bytes memory weights) public {
+        Model memory model = Model({
+            identifier: identifier,
+            weights: weights
         });
-
-        characters[dto.apiUid] = character;
-        characterIds.push(dto.apiUid);
+        models[identifier] = model;
+        modelIds.push(identifier);
     }
 
-    function getAllCharacters()
-        public
-        view
-        returns (StarWarsCharacter[] memory)
-    {
-        StarWarsCharacter[] memory result = new StarWarsCharacter[](
-            characterIds.length
-        );
-        for (uint256 i = 0; i < characterIds.length; i++) {
-            result[i] = characters[characterIds[i]];
-        }
-        return result;
+    function getAllModels() public view returns (Model[] memory) {
+        Model[] memory allModels = new Model[](modelIds.length); // Create an array in memory
+
+        for (uint i = 0; i < modelIds.length; i++) {
+            allModels[i] = models[modelIds[i]]; // Retrieve the model using the ID
+        }  
+        return allModels;
+    }
+
+    function getModel(string memory identifier) public view returns (Model memory) {
+        return models[identifier];
     }
 
     function getFdcHub() external view returns (IFdcHub) {
