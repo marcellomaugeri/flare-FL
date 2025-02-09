@@ -16,9 +16,9 @@ function toHex(data) {
 const { JQ_VERIFIER_URL_TESTNET, JQ_API_KEY, VERIFIER_URL_TESTNET, VERIFIER_PUBLIC_API_KEY_TESTNET, DA_LAYER_URL_COSTON } = process.env;
 
 const TX_ID =
-    "0xae295f8075754f795142e3238afa132cd32930f871d21ccede22bbe80ae31f73";
+    "0xe28502595518c91d8b65392af5abe27ab81f819e9083f5d37c1c85958dec09d7";
 
-const MODEL_LIST_ADDRESS = "0x5F7EfACc8e26938E8C25A7EAC72D14059f0E764c"; // coston2
+const MODEL_LIST_ADDRESS = "0x05b09d9D032cE33933a43E5Fe9b612e2D330751e"; // The address of the contract
 
 async function deployMainList() {
     const list: ModelsInstance = await Models.new();
@@ -31,9 +31,9 @@ async function deployMainList() {
     })
 }
 
-//deployMainList().then((data) => {
-//   process.exit(0);
-//});
+/*deployMainList().then((data) => {
+   process.exit(0);
+});*/
 
 
 async function prepareRequest() {
@@ -43,23 +43,18 @@ async function prepareRequest() {
         "attestationType": attestationType,
         "sourceId": sourceType,
         "requestBody": {
-            "url": "http://c3d1-163-1-81-192.ngrok-free.app/validate_model?model=cifar10&weights=%2FUsers%2Fmarcellomaugeri%2FDocuments%2Fflare-FL%2Fsrc%2Fdata%2Fcifar10%2Fcifar10_weights.weights.h5",
-            "postprocessJq": `{name: .model, weights: .weights} + (if (.error == null or .error == "") then {error: ""} else {error: .error} end)`,
+            "url": "https://30e4-163-1-81-192.ngrok-free.app/validate?model_id=cifar10&update_id=412e758abe56e0fe6d33dad4490b7c30a80db120297a0cbd6082c592d0e90632",
+            "postprocessJq": `{model_id: .model_id, update_id: .update_id}`,
         "abi_signature": `{
           \"components\": [
             {
               \"internalType\": \"string\",
-              \"name\": \"name\",
+              \"name\": \"model_id\",
               \"type\": \"string\"
             },
             {
-              \"internalType\": \"bytes\",
-              \"name\": \"weights\",
-              \"type\": \"bytes\"
-            },
-            {
               \"internalType\": \"string\",
-              \"name\": \"error\",
+              \"name\": \"update_id\",
               \"type\": \"string\"
             }
           ],
@@ -91,11 +86,11 @@ async function prepareRequest() {
     return data;
 }
 
-
+/*
 prepareRequest().then((data) => {
     console.log("Prepared request:", data);
     process.exit(0);
-});
+});*/
 
 const firstVotingRoundStartTs = 1658429955;
 const votingEpochDurationSeconds = 90;
@@ -128,13 +123,13 @@ async function submitRequest() {
     return roundId;
 }
 
-//submitRequest().then((data) => {
-//    console.log("Submitted request:", data);
-//    process.exit(0);
-//});
+/*submitRequest().then((data) => {
+    console.log("Submitted request:", data);
+    process.exit(0);
+});*/
 
 
-const TARGET_ROUND_ID = 894447; // 0
+const TARGET_ROUND_ID = 896134; // 0
 
 async function getProof(roundId: number) {
     const request = await prepareRequest();
@@ -156,35 +151,52 @@ async function getProof(roundId: number) {
     return await proofAndData.json();
 }
 
-// getProof(TARGET_ROUND_ID)
-//     .then((data) => {
-//         console.log("Proof and data:");
-//         console.log(JSON.stringify(data, undefined, 2));
-//     })
-//     .catch((e) => {
-//         console.error(e);
-//     });
+/*getProof(TARGET_ROUND_ID)
+    .then((data) => {
+        console.log("Proof and data:");
+        console.log(JSON.stringify(data, undefined, 2));
+    })
+    .catch((e) => {
+        console.error(e);
+    });*/
 
 
 async function submitProof() {
     const dataAndProof = await getProof(TARGET_ROUND_ID);
     console.log(dataAndProof);
-    const starWarsList = await Models.at(MODEL_LIST_ADDRESS);
+    const modelList = await Models.at(MODEL_LIST_ADDRESS);
 
-    const tx = await starWarsList.addCharacter({
+    const tx = await modelList.addLocalUpdate({
         merkleProof: dataAndProof.proof,
         data: dataAndProof.response,
     });
     console.log(tx.tx);
-    console.log(await starWarsList.getAllCharacters());
+    console.log(await modelList.getAllModels());
 }
 
-
-/*submitProof()
+submitProof()
     .then((data) => {
         console.log("Submitted proof");
         process.exit(0);
     })
     .catch((e) => {
         console.error(e);
+    });
+
+// Call the contract to create a model with a string identifier
+async function createModel(modelId: string) {
+    const modelList = await Models.at(MODEL_LIST_ADDRESS);
+    const tx = await modelList.createModel(modelId);
+    console.log(tx.tx);
+}
+
+// Example usage
+/*createModel("cifar10")
+    .then(() => {
+        console.log("Model created successfully");
+        process.exit(0);
+    })
+    .catch((e) => {
+        console.error(e);
+        process.exit(1);
     });*/

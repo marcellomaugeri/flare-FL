@@ -13,14 +13,13 @@ import {IJsonApi} from "@flarenetwork/flare-periphery-contracts/coston/IJsonApi.
 //import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 struct Model {
-    string identifier;
-    bytes weights;
+    string model_id;
+    string[] update_ids;
 }
 
 struct DataTransportObject {
-    string name;
-    bytes weights;
-    string error;
+    string model_id;
+    string update_id;
 }
 
 contract Models {
@@ -37,7 +36,7 @@ contract Models {
             );
     }
 
-    function addModel(IJsonApi.Proof calldata data) public {
+    function addLocalUpdate(IJsonApi.Proof calldata data) public {
         require(isJsonApiProofValid(data), "Invalid proof");
 
         DataTransportObject memory dto = abi.decode(
@@ -45,31 +44,35 @@ contract Models {
             (DataTransportObject)
         );
 
-        // Require error to be empty
-        require(bytes(dto.error).length == 0, "Error in data");
+        // Require that the model exists and the update_id unique
+        require(
+            bytes(models[dto.model_id].model_id).length > 0,
+            "Model does not exist"
+        );
 
-        // TODO: Check if model already exists? Not sure if this is needed, the API already does it
+        bool updateExists = false;
+        for (uint i = 0; i < models[dto.model_id].update_ids.length; i++) {
+            if (keccak256(abi.encodePacked(models[dto.model_id].update_ids[i])) == keccak256(abi.encodePacked(dto.update_id))) {
+                updateExists = true;
+                break;
+            }
+        }
+        require(!updateExists, "Update already exists");
 
-        // Perform the model update by storing the weights
-
-        Model memory model = Model({
-            identifier: dto.name,
-            weights: dto.weights
-        });
-        models[dto.name] = model;
-        modelIds.push(dto.name);
+        // Append the update_id to the update_ids array
+        models[dto.model_id].update_ids.push(dto.update_id);
     }
 
-    function createModel(string memory identifier, bytes memory weights) public {
+    function createModel(string memory model_id) public {
         // If the model already exists, do not allow it to be updated
-        require(bytes(models[identifier].identifier).length == 0, "Model already exists");
+        require(bytes(models[model_id].model_id).length == 0, "Model already exists");
 
         Model memory model = Model({
-            identifier: identifier,
-            weights: weights
+            model_id: model_id,
+            update_ids: new string[](0)
         });
-        models[identifier] = model;
-        modelIds.push(identifier);
+        models[model_id] = model;
+        modelIds.push(model_id);
     }
 
     function getAllModels() public view returns (Model[] memory) {
@@ -81,9 +84,9 @@ contract Models {
         return allModels;
     }
 
-    function getModel(string memory identifier) public view returns (Model memory) {
-        require(bytes(models[identifier].identifier).length > 0, "Model does not exist");
-        return models[identifier];
+    function getModel(string memory model_id) public view returns (Model memory) {
+        require(bytes(models[model_id].model_id).length > 0, "Model does not exist");
+        return models[model_id];
     }
 
     function getFdcHub() external view returns (IFdcHub) {
@@ -98,6 +101,7 @@ contract Models {
         return ContractRegistry.getFdcRequestFeeConfigurations();
     }
 
+    //Empty, but needed to obtain the abi specification
     function setDataTransportObject(DataTransportObject memory dto) public {
     }
     

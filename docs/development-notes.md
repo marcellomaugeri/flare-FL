@@ -16,3 +16,8 @@ cd client_module
 poetry build -f wheel
 pip install --force-reinstall dist/*.whl
 ```
+
+### Run the contracts
+```console
+npx hardhat run scripts/FlareFL.ts --network coston
+```

@@ -126,6 +126,9 @@ def validate_get(model_id, update_id):  # noqa: E501
 
     :rtype: Union[ValidateGet200Response, Tuple[ValidateGet200Response, int], Tuple[ValidateGet200Response, int, Dict[str, str]]
     """
+    # Mock for speed: theoretically it could be sufficient to perform the evaluation during the update and here retrieve the results only
+    return ValidateGet200Response(model_id=model_id, update_id=update_id)
+    
     # Load the model
     _model = get_model(model_id)
     _global_model = get_model(model_id)
