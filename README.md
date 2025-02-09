@@ -34,100 +34,88 @@ The possibilities are endless and the `Flare` chain provides a solid foundation 
 - `Attestation Provider`: The Attestation Provider is the entity that evaluates the Attestation Request. It queries the TTP to verify that the model update does not degrade the global model.
 - `Trusted Third Party (TTP)`: The TTP is the entity that stores and maintains the global model. It is responsible for verifying that the model update does not degrade the global model.
 
-### Repository Structure
+### Repository Summary
 
-TO DO AT THE END
+```
+.
+├── contracts
+│   ├── FlareFL.sol # The FlareFL smart contract, the core of the project
+|
+├── scripts
+│   ├── FlareFL.ts # The script to deploy and use the FlareFL smart contract
+|
+├── src
+│   ├── client_module # The client module to communicate with the TTP)
+│   ├── server # The TTP which validates and store the model updates (flask server)
+|   ├── openapi.yaml # The OpenAPI specification of the TTP
+|
+├── demo.py # The demo script to show how the project works
+```
 
-### Demo
+### Getting started
 
-TO DO AT THE END -> Embed a youtube video
+1. Clone the repository
+```console
+git clone https://github.com/marcellomaugeri/flare-FL
+cd flare-FL
+```
 
-### Installation
-
-TO DO
-
-### Run the Validator Server
-
-#### Install Python dependencies
+2. Install Python dependencies
 ```console
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Install the client
+3. Install hardhat, yarn and node.
 
+4. Install the node dependencies
+```console
+npm install
+```
+
+5. Setup the `.env` file (Change the `PRIVATE_KEY` in the `.env` file to your wallet private key, and the `JQ_API_KEY` to `flare-oxford-2025`)
+```console
+mv .env.example .env
+```
+
+6. Compile the project
+```console
+npx hardhat compile
+```
+
+7. Install the client module
 ```console
 cd src/client_module
 poetry build -f wheel
 pip install dist/*.whl
 ```
 
-### Run the client
-The client allows to generate 
+8. Install ngrok (dependent on the OS) and perform the initial setup
 
-```console
-python 
-```
+### Demo
+The demo is designed to show how the project works.
+1. At the beginning, it will spawn the `TTP` server (flask server) and a ngrok tunnel (to expose the TTP to the validators).
+2. Then, it will run a simulation where the client trains a model and submits an attestation request to the validators.
+3. The validators will query the TTP to verify the model update and vote to approve or reject the request.
+4. Finally, the client will submit the model update to the Flare chain.
+5. Once done, the client will query the Flare chain to get all the model updates and will aggregate them to its local model.
+6. Then, it performs a round of testing to evaluate the performance of the model.
 
-### Install the frontend
 
-```console
-cd frontend
-yarn install # requires yarn
-yarn start
-```
+TO DO AT THE END -> Embed a youtube video
 
-## Flare Hardhat Starter Kit
 
-### Getting started
-
-If you are new to Hardhat please check the [Hardhat getting started doc](https://hardhat.org/hardhat-runner/docs/getting-started#overview)
-
-1. Clone and install dependencies:
-
-   ```console
-   git clone https://github.com/marcellomaugeri/flare-FL
-   cd flare-FL
-   npm install
-   ```
-
-2. Set up `.env` file
-
-   ```console
-   mv .env.example .env
-   ```
-
-3. Change the `PRIVATE_KEY` in the `.env` file to yours
-
-4. Change the `JQ_API_KEY` to `flare-oxford-2025` in the `.env` file
-
-4. Compile the project
-
-    ```console
-    npx hardhat compile
-    ```
-
-    This will compile all `.sol` files in your `/contracts` folder. It will also generate artifacts that will be needed for testing. Contracts `Imports.sol` import MockContracts and Flare related mocks, thus enabling mocking of the contracts from typescript.
-
-5. Run Tests
-
-    ```console
-    npx hardhat test
-    ```
-
-6. Deploy
-
-    Check the `hardhat.config.ts` file, where you define which networks you want to interact with. Flare mainnet & test network details are already added in that file.
-
-    Make sure that you have added API Keys in the `.env` file
-
-   ```console
-   npx hardhat run scripts/tryDeployment.ts
-   ```
-
-#### TO DO
+### To-do list
 - Refactor the server as there is duplicated code (`mlmodels`, `data` and `utils`).
+- Rewrite the tests (they are not working with latest changes).
+
+### Ideas for the future
+- Implement a strategy to maintain a global model (e.g. FedAvg).
+- Design a DAO to choose the Attestation Providers.
+- Implement a detection validator to detect adversarial updates.
+- Provide incentives to the Attestation Providers and the participants.
+- Replace the TTP with a decentralized solution (Flare is working on a feature to run a specific code).
 
 ### Feedback about my experience with building on Flare.
 I have been buzzling in blockchains only for a few months, and I have to say that building on Flare was a valuable experience. Despite being able to read Solidity code fluently, it was thanks to their starter kit that I was able to write and deploy my first (serious) smart contract.

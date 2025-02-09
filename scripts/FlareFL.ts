@@ -15,12 +15,18 @@ function toHex(data) {
 
 const { JQ_VERIFIER_URL_TESTNET, JQ_API_KEY, VERIFIER_URL_TESTNET, VERIFIER_PUBLIC_API_KEY_TESTNET, DA_LAYER_URL_COSTON } = process.env;
 
-const TX_ID =
-    "0xe28502595518c91d8b65392af5abe27ab81f819e9083f5d37c1c85958dec09d7";
+const TX_ID = "0xe28502595518c91d8b65392af5abe27ab81f819e9083f5d37c1c85958dec09d7";
 
-const MODEL_LIST_ADDRESS = "0x05b09d9D032cE33933a43E5Fe9b612e2D330751e"; // The address of the contract
+// The address of the contract
+const MODEL_LIST_ADDRESS = "0x86861573AAe42FBD7F0BE0A0EDC1f727A787e207"; 
 
-async function deployMainList() {
+// Constants for voting rounds
+const firstVotingRoundStartTs = 1658429955;
+const votingEpochDurationSeconds = 90;
+
+
+// Code to deploy the contract. Not needed anymore
+async function deploy() {
     const list: ModelsInstance = await Models.new();
 
     console.log("Char list deployed at:", list.address);
@@ -29,6 +35,7 @@ async function deployMainList() {
         address: list.address,
         constructorArguments: [],
     })
+    return result;
 }
 
 /*deployMainList().then((data) => {
@@ -36,14 +43,14 @@ async function deployMainList() {
 });*/
 
 
-async function prepareRequest() {
+async function prepareRequest(url: string, update_id: string,  modelId: string = "cifar10") {
     const attestationType = "0x" + toHex("IJsonApi");
     const sourceType = "0x" + toHex("WEB2");
     const requestData = {
         "attestationType": attestationType,
         "sourceId": sourceType,
         "requestBody": {
-            "url": "https://30e4-163-1-81-192.ngrok-free.app/validate?model_id=cifar10&update_id=412e758abe56e0fe6d33dad4490b7c30a80db120297a0cbd6082c592d0e90632",
+            "url": url+"/validate?model_id="+modelId+"&update_id="+update_id,
             "postprocessJq": `{model_id: .model_id, update_id: .update_id}`,
         "abi_signature": `{
           \"components\": [
@@ -65,10 +72,8 @@ async function prepareRequest() {
         }
     };
 
-
-
     // Print JSON.stringify(requestData),
-    console.log(JSON.stringify(requestData));
+    //console.log(JSON.stringify(requestData));
 
     const response = await fetch(
         `${JQ_VERIFIER_URL_TESTNET}JsonApi/prepareRequest`,
@@ -86,17 +91,17 @@ async function prepareRequest() {
     return data;
 }
 
+// Code to prepare the request
 /*
 prepareRequest().then((data) => {
     console.log("Prepared request:", data);
     process.exit(0);
 });*/
 
-const firstVotingRoundStartTs = 1658429955;
-const votingEpochDurationSeconds = 90;
 
-async function submitRequest() {
-    const requestData = await prepareRequest();
+
+async function submitRequest(url: string, update_id: string, modelId: string = "cifar10") {
+    const requestData = await prepareRequest(url, update_id, modelId);
 
     const modelList: ModelsInstance = await Models.at(MODEL_LIST_ADDRESS);
 
@@ -117,9 +122,9 @@ async function submitRequest() {
     const roundId = Math.floor(
         (block!.timestamp - firstVotingRoundStartTs) / votingEpochDurationSeconds,
     );
-    console.log(
+    /*console.log(
         `Check round progress at: https://coston-systems-explorer.flare.rocks/voting-epoch/${roundId}?tab=fdc`,
-    );
+    );*/
     return roundId;
 }
 
@@ -129,10 +134,10 @@ async function submitRequest() {
 });*/
 
 
-const TARGET_ROUND_ID = 896134; // 0
+//const TARGET_ROUND_ID = 896134; // 0
 
-async function getProof(roundId: number) {
-    const request = await prepareRequest();
+async function getProof(roundId: number, url: string, update_id: string, modelId: string = "cifar10") {
+    const request = await prepareRequest(url, update_id, modelId);
     const proofAndData = await fetch(
         `${DA_LAYER_URL_COSTON}fdc/get-proof-round-id-bytes`,
         {
@@ -161,27 +166,18 @@ async function getProof(roundId: number) {
     });*/
 
 
-async function submitProof() {
-    const dataAndProof = await getProof(TARGET_ROUND_ID);
-    console.log(dataAndProof);
+async function submitProof(roundId: number, url: string, update_id: string, modelId: string = "cifar10") {
+    const dataAndProof = await getProof(roundId, url, update_id, modelId);
+    //console.log(dataAndProof);
     const modelList = await Models.at(MODEL_LIST_ADDRESS);
 
     const tx = await modelList.addLocalUpdate({
         merkleProof: dataAndProof.proof,
         data: dataAndProof.response,
     });
-    console.log(tx.tx);
-    console.log(await modelList.getAllModels());
+    //console.log(tx.tx);
+    //console.log(await modelList.getAllModels());
 }
-
-submitProof()
-    .then((data) => {
-        console.log("Submitted proof");
-        process.exit(0);
-    })
-    .catch((e) => {
-        console.error(e);
-    });
 
 // Call the contract to create a model with a string identifier
 async function createModel(modelId: string) {
@@ -200,3 +196,48 @@ async function createModel(modelId: string) {
         console.error(e);
         process.exit(1);
     });*/
+
+async function get_all_model_updates(modelId: string) {
+    const modelList = await Models.at(MODEL_LIST_ADDRESS);
+    const updates = await modelList.getAllModelUpdates(modelId);
+    return updates;
+}
+
+// Parse the command line arguments:
+//.addParam("url", "The URL of the TTP (ngrok)")
+// .addParam("updateId", "The update ID - the digest of the model update")
+// .addOptionalParam("modelId", "The model ID - the string identifier of the model")
+// .addOptionalParam("roundId", "The round ID - the round ID of the voting round")
+// .addParam("command", "The command to run")
+async function main(url: string, updateId: string, modelId: string = "cifar10", roundId: string, command: string) {
+    // Switch on the command
+    switch (command) {
+        case "prepareRequest":
+            await prepareRequest(url, updateId, modelId);
+            break;
+        case "submitRequest":
+            await submitRequest(url, updateId, modelId);
+            break;
+        case "getProof":
+            await getProof(parseInt(roundId), url, updateId, modelId);
+            break;
+        case "submitProof":
+            await submitProof(parseInt(roundId), url, updateId, modelId);
+            break;
+        case "createModel":
+            await createModel(modelId);
+            break;
+        case "get_all_model_updates":
+            const updates = await get_all_model_updates(modelId);
+            break;
+        case "deploy":
+            const address = await deploy();
+            console.log("Deployed contract address:", address);
+            break;
+        default:
+            throw new Error(`Unknown command: ${command}`);
+    }
+}
+
+// Export the main function as the default export
+export default main;

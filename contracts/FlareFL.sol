@@ -66,7 +66,7 @@ contract Models {
     function createModel(string memory model_id) public {
         // If the model already exists, do not allow it to be updated
         require(bytes(models[model_id].model_id).length == 0, "Model already exists");
-
+        
         Model memory model = Model({
             model_id: model_id,
             update_ids: new string[](0)
@@ -82,6 +82,11 @@ contract Models {
             allModels[i] = models[modelIds[i]]; // Retrieve the model using the ID
         }  
         return allModels;
+    }
+
+    function getAllUpdates(string memory model_id) public view returns (string[] memory) {
+        require(bytes(models[model_id].model_id).length > 0, "Model does not exist");
+        return models[model_id].update_ids;
     }
 
     function getModel(string memory model_id) public view returns (Model memory) {

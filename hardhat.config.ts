@@ -11,6 +11,7 @@ const { GOERLI_API_URL, PRIVATE_KEY, ETHERSCAN_API_URL, SEPOLIA_API_KEY, FLARESC
 const USE_FLARESCAN = false;
 
 import { TASK_COMPILE } from 'hardhat/builtin-tasks/task-names';
+import { string } from 'hardhat/internal/core/params/argumentTypes.js';
 
 // Override solc compile task and filter out useless warnings
 task(TASK_COMPILE)
@@ -22,6 +23,20 @@ task(TASK_COMPILE)
       return text;
     });
     await runSuper(args);
+  });
+
+// Define a new task which will run the FlareFL.ts script with arguments
+task("run-script", "Runs the FlareFL.ts script")
+  .addParam("url", "The URL of the TTP (ngrok)")
+  .addParam("updateId", "The update ID - the digest of the model update")
+  .addOptionalParam("modelId", "The model ID - the string identifier of the model")
+  .addOptionalParam("roundId", "The round ID - the round ID of the voting round")
+  .addParam("command", "The command to run")
+  // Do not forget --network coston
+  .setAction(async (taskArgs, hre) => {
+    const { url, update_id, model_id, round_id, command } = taskArgs;
+    const scriptModule = await import(`./scripts/FlareFL.ts`);
+    await scriptModule.default(url, update_id, model_id, round_id, command);
   });
 
 
