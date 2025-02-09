@@ -2,6 +2,7 @@
 Submission for the `AI track`, `Flare`'s track `1` & `2`, and the `NERDo Awards` from `DeSci` at the `ETHOxford Hackathon 2025` by [@marcellomaugeri](https://github.com/marcellomaugeri).
 
 ![Flare-FL Logo](./img/Flare-FL.jpg)
+
 Disclaimer: the project is not affiliated with Flare, but the logo was greatly inspired since it is a submission for the Flare track. As a consequence, the logo is a derivative work of the Flare logo and it is not intended to be used for commercial purposes.
 
 ### Abstract
