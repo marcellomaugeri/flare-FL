@@ -18,7 +18,7 @@ const { JQ_VERIFIER_URL_TESTNET, JQ_API_KEY, VERIFIER_URL_TESTNET, VERIFIER_PUBL
 const TX_ID = "0xe28502595518c91d8b65392af5abe27ab81f819e9083f5d37c1c85958dec09d7";
 
 // The address of the contract
-const MODEL_LIST_ADDRESS = "0x86861573AAe42FBD7F0BE0A0EDC1f727A787e207"; 
+const MODEL_LIST_ADDRESS = "0x174A13b16E359b851f2b9Cf37Fe70450fD625d86"; 
 
 // Constants for voting rounds
 const firstVotingRoundStartTs = 1658429955;
@@ -125,6 +125,7 @@ async function submitRequest(url: string, update_id: string, modelId: string = "
     /*console.log(
         `Check round progress at: https://coston-systems-explorer.flare.rocks/voting-epoch/${roundId}?tab=fdc`,
     );*/
+    console.log(roundId)
     return roundId;
 }
 
@@ -168,15 +169,16 @@ async function getProof(roundId: number, url: string, update_id: string, modelId
 
 async function submitProof(roundId: number, url: string, update_id: string, modelId: string = "cifar10") {
     const dataAndProof = await getProof(roundId, url, update_id, modelId);
-    //console.log(dataAndProof);
+    console.log(dataAndProof);
     const modelList = await Models.at(MODEL_LIST_ADDRESS);
 
     const tx = await modelList.addLocalUpdate({
         merkleProof: dataAndProof.proof,
         data: dataAndProof.response,
     });
-    //console.log(tx.tx);
+    console.log(tx.tx);
     //console.log(await modelList.getAllModels());
+    return tx;
 }
 
 // Call the contract to create a model with a string identifier
@@ -203,32 +205,44 @@ async function get_all_model_updates(modelId: string) {
     return updates;
 }
 
+async function get_all_models() {
+    const modelList = await Models.at(MODEL_LIST_ADDRESS);
+    const models = await modelList.getAllModels();
+    //For each model, take the first field
+    return models.map((model) => model[0]);
+}
+
 // Parse the command line arguments:
 //.addParam("url", "The URL of the TTP (ngrok)")
 // .addParam("updateId", "The update ID - the digest of the model update")
 // .addOptionalParam("modelId", "The model ID - the string identifier of the model")
 // .addOptionalParam("roundId", "The round ID - the round ID of the voting round")
 // .addParam("command", "The command to run")
-async function main(url: string, updateId: string, modelId: string = "cifar10", roundId: string, command: string) {
+async function main(url: string, updateid: string, modelid: string = "cifar10", roundid: string, command: string) {
     // Switch on the command
+    console.log("Il round id è", roundid);
     switch (command) {
         case "prepareRequest":
-            await prepareRequest(url, updateId, modelId);
+            await prepareRequest(url, updateid, modelid);
             break;
         case "submitRequest":
-            await submitRequest(url, updateId, modelId);
+            await submitRequest(url, updateid, modelid);
             break;
         case "getProof":
-            await getProof(parseInt(roundId), url, updateId, modelId);
+            await getProof(parseInt(roundid), url, updateid, modelid);
             break;
         case "submitProof":
-            await submitProof(parseInt(roundId), url, updateId, modelId);
+            await submitProof(parseInt(roundid), url, updateid, modelid);
             break;
         case "createModel":
-            await createModel(modelId);
+            await createModel(modelid);
             break;
         case "get_all_model_updates":
-            const updates = await get_all_model_updates(modelId);
+            const updates = await get_all_model_updates(modelid);
+            break;
+        case "get_all_models":
+            const models = await get_all_models();
+            console.log(models);
             break;
         case "deploy":
             const address = await deploy();

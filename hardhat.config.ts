@@ -27,16 +27,16 @@ task(TASK_COMPILE)
 
 // Define a new task which will run the FlareFL.ts script with arguments
 task("run-script", "Runs the FlareFL.ts script")
-  .addParam("url", "The URL of the TTP (ngrok)")
-  .addParam("updateId", "The update ID - the digest of the model update")
-  .addOptionalParam("modelId", "The model ID - the string identifier of the model")
-  .addOptionalParam("roundId", "The round ID - the round ID of the voting round")
-  .addParam("command", "The command to run")
+  .addOptionalParam("url", "The URL of the TTP (ngrok)")
+  .addOptionalParam("updateid", "The update ID - the digest of the model update")
+  .addOptionalParam("modelid", "The model ID - the string identifier of the model")
+  .addOptionalParam("roundid", "The round ID - the round ID of the voting round")
+  .addOptionalParam("command", "The command to run")
   // Do not forget --network coston
   .setAction(async (taskArgs, hre) => {
-    const { url, update_id, model_id, round_id, command } = taskArgs;
+    const { url, updateid, modelid, roundid, command } = taskArgs;
     const scriptModule = await import(`./scripts/FlareFL.ts`);
-    await scriptModule.default(url, update_id, model_id, round_id, command);
+    await scriptModule.default(url, updateid, modelid, roundid, command);
   });
 
 

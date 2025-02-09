@@ -75,11 +75,11 @@ contract Models {
         modelIds.push(model_id);
     }
 
-    function getAllModels() public view returns (Model[] memory) {
-        Model[] memory allModels = new Model[](modelIds.length); // Create an array in memory
+    function getAllModels() public view returns (string[] memory) {
+        string[] memory allModels = new string[](modelIds.length); // Create an array in memory
 
         for (uint i = 0; i < modelIds.length; i++) {
-            allModels[i] = models[modelIds[i]]; // Retrieve the model using the ID
+            allModels[i] = models[modelIds[i]].model_id; // Retrieve the model using the ID
         }  
         return allModels;
     }
