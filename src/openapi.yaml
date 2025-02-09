@@ -1,39 +1,199 @@
 openapi: 3.0.0
 info:
-  title: Model Validation API
+  title: Model Update and Validation API
   version: 1.0.0
-  description: API for validating a model with provided weights
+  description: API for model updates, validation, and retrieval.
+
 paths:
-  /validate_model:
-    get:
-      summary: Validate the model with provided weights
-      parameters:
-        - in: query
-          name: model
-          schema:
-            type: string
-            enum: ["cifar10"]
-          required: true
-          description: The model architecture
-        - in: query
-          name: weights
-          schema:
-            type: string
-          required: true
-          description: The model weights (to overcome the limitation of GET request, this field will receive a file path for now)
+  /update_model:
+    post:
+      summary: Update model with hex string.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                model_id:
+                  type: string
+                  enum: ["cifar10"]
+                hex_weights:
+                  type: string
+                  format: hex
+              required:
+                - model_id
+                - hex_weights
       responses:
         "200":
-          description: Validation result
+          description: "Success. Returns the update ID (SHA256 hash)."
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  model:
+                  update_id:
                     type: string
-                  weights:
-                    type: string
-                    format: base64
+                    description: The SHA256 hash of the uploaded weights.
+        "400":
+          description: "Bad Request (invalid input or format)."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
                   error:
                     type: string
-                    nullable: true
+                    description: Description of the error.
+
+  /update_model_from_file:
+    post:
+      summary: Update model from file.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                model_id:
+                  type: string
+                  enum: ["cifar10"]
+                file_path:
+                  type: string
+              required:
+                - model_id
+                - file_path
+      responses:
+        "200":
+          description: "Success. Returns the update ID (SHA256 hash)."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  update_id:
+                    type: string
+                    description: The SHA256 hash of the file contents.
+        "400":
+          description: "Bad Request (file not found or other error)."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Description of the error.
+
+  /validate:
+    get:
+      summary: Validate model update.
+      parameters:
+        - in: query
+          name: model_id
+          required: true
+          schema:
+            type: string 
+        - in: query
+          name: update_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Validation successful. Returns model_id and update_id."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_id:
+                    type: string
+                    description: The model ID.
+                  update_id:
+                    type: string
+                    description: The update ID (SHA256 hash).
+        "400":
+          description: "Bad Request (missing parameters)."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "409":
+          description: "Validation failed."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message.
+
+  /get_local_update:
+    get:
+      summary: Get local update weights.
+      parameters:
+        - in: query
+          name: model_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: update_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Success. Returns the model weights as a hex string."
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: hex
+                description: The model weights in hexadecimal format.
+        "400":
+          description: Bad Request (missing parameters).
+
+  /global_model:
+    get:
+      summary: Retrieve global model weights.
+      parameters:
+        - in: query
+          name: model_id
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Success. Returns the global model weights."
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: hex
+                description: The model weights in hexadecimal format.
+        "400":
+          description: "Bad Request (missing parameters)."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        "404":
+          description: "Not Found (model ID doesn't exist)."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message (model not found).

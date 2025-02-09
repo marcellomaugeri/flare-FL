@@ -1,32 +1,46 @@
-## Flare-FL
+## Flare-FL: Federated Learning on the Flare Chain through the use of the Flare Data Connector
+Submission for the `AI track`, `Flare`'s track `1` & `2`, and the `NERDo Awards` from `DeSci` at the `ETHOxford Hackathon 2025` by [@marcellomaugeri](https://github.com/marcellomaugeri).
 
 ### Abstract
-I present Flare-FL, a decentralized Federated Learning (FL) framework that uses the Flare chain and the Flare Data Connector to decentralize the training process with the objective of improving the security of the model and the privacy of the clients.
+`Flare-FL` is a decentralized Federated Learning (FL) framework that uses the `Flare` chain and the `Flare Data Connector` to decentralize the training process with the objective of improving the security of the model and the privacy of the clients.
 
-In particular, the Flare Data Connector allows user to submit an `Attestation Request`, which is evaluated by the `Attestation Providers`. The providers validate the request and vote to approve or reject it. If the request is approved, the partial updates (weights) are stored on the Flare chain. The global model is updated with the new weights thanks to the `Model Updater` smart contract.
+A user, called `Client`, can train a model on its local data. Then, it sends the model update to a `trusted third party (TTP)`. The `TTP` calculates a `SHA256` digest of the model and stores it in a db.
 
-Flare-FL allows to train a model across multiple clients, without sharing their data. The Flare chain is used to store the global model and the weights of the clients. The Flare Data Connector is used to store the data of the clients. The training process is divided into three phases: Collect, Choose, and Resolution. In the Collect phase, the client submits an Attestation Request to the Attestation Providers. In the Choose phase, the Attestation Providers choose which requests to accept. In the Resolution phase, the Attestation Providers evaluate the client's updated model and, if it is good enough, the new weights are stored on the Flare chain. The global model is updated with the new weights thanks to the Model Updater smart contract.
-Federated Learning allows to train a model across multiple clients, without sharing their data. However, classical FL has some limitations, such as the need for a central server to coordinate the training process. Flare-FL is a decentralized FL framework that uses the Flare chain and the Flare Data Connector to decentralize the training process.
+At this point, the `Client` can submit an `Attestation Request` to the `Attestation Providers`. The request contains the `SHA256` digest of the model update. The `Attestation Providers` queries the `TTP` to verify that the model update does not degrade the global model. According to the result, the `Attestation Providers` vote to approve or reject the request.
+If the request is approved, the model update will be stored on the `Flare` chain.
+
+The `TTP` is responsible for storing and maintaining the global model. For the sake of simplicity, currently the global model is fixed and not updated. However, the `TTP` can be extended easily to employ a strategy to update the global model (e.g. FedAvg).
+
+### Contribution
+
+The contribution of this project is two-fold:
+1. `Federated Learning` inherently suffers from model poisoning attacks when malicious clients submit adversarial updates. The `Attestation Providers` act as validators to ensure that the model update is not malicious, by querying the `TTP` to verify that the model update does not degrade the global model.
+2. The `Flare Data Connector` is used to store the model update digests on the `Flare` chain. This allows to decentralize the training process, improving the integrity of the model while preserving the privacy of the clients (as the training data is not shared).
+
+### Limitations and Future Work
+In the current implementation, the `Attestation Providers` simply query the `TTP` to verify the model update. However, in future works the `Attestation Providers` could be extended to employ more and different strategies to evaluate the model update.
+For example, one `Attestation Provider` could use a detection algorithm to detect adversarial updates, while another `Attestation Provider` could use a different algorithm.
+Another functionality that could be added is the institution of a `DAO` to choose which users are authorized to be `Attestation Providers` or request attestations.
+The possibilities are endless and the `Flare` chain provides a solid foundation to build upon.
+
+
+### Glossary and Entities
+- `Client`: The client is the entity that trains the model on its local data.
+- `Attestation Request`: The Attestation Request is a request submitted by the client to the Attestation Providers. It contains the local model of the client.
+- `Attestation Provider`: The Attestation Provider is the entity that evaluates the Attestation Request. It queries the TTP to verify that the model update does not degrade the global model.
+- `Trusted Third Party (TTP)`: The TTP is the entity that stores and maintains the global model. It is responsible for verifying that the model update does not degrade the global model.
 
 ### Repository Structure
 
+TO DO AT THE END
+
+### Demo
+
+TO DO AT THE END -> Embed a youtube video
+
+### Installation
+
 TO DO
-
-### Workflow
-0. The client downloads the global model (weights) from the Flare chain.
-1. The client trains the model on its local data.
-2. [Collect Phase] The client submits an `Attestation Request` (and pays the fee) to 
-3. [Choose Phase] Each `Attestation Provider` chooses which requests to accept. In particular, the `Attestation Provider` call a remote API to evaluate the client's updated model.
-4. [Resolution Phase] If the `Attestation Provider` accepts the request, i.e. the client's model is good enough, the new weights are stored on the Flare chain.
-5. The global model is updated with the new weights thanks to the `Model Updater` smart contract.
-
-### User Workflow
-0. The client downloads the global model (weights) from the Flare chain.
-1. The client trains the model on its local data.
-2. The client submits an `Attestation Request` (and pays the fee).
-3. The client waits for the request to be accepted.
-4. Once the `Model Updater` smart contract updates the global model, the client can download the new weights.
-Repeat from step 1.
 
 ### Run the Validator Server
 
@@ -61,9 +75,6 @@ yarn start
 ```
 
 ## Flare Hardhat Starter Kit
-
-**IMPORTANT!!**
-The supporting library uses Openzeppelin version `4.9.3`, be careful to use the documentation and examples from that library version.
 
 ### Getting started
 
@@ -113,3 +124,17 @@ If you are new to Hardhat please check the [Hardhat getting started doc](https:/
 
 #### TO DO
 - Refactor the server as there is duplicated code (`mlmodels`, `data` and `utils`).
+
+### Feedback about my experience with building on Flare.
+I have been buzzling in blockchains only for a few months, and I have to say that building on Flare was a valuable experience. Despite being able to read Solidity code fluently, it was thanks to their starter kit that I was able to write and deploy my first (serious) smart contract.
+My main difficulty was to understand what was happening on the `Attestation Provider` side, as the source code was not -- initially -- provided. However, the Flare team was very helpful and provided me a snippet. I cannot wait to see the future implementations of the `Attestation Providers`, in particular the feature which allows to run a specific code. If you know, you know.
+
+### References
+- [Flare Data Connector Whitepaper](https://flare.network/wp-content/uploads/FDC_WP_14012025.pdf)
+- [The Flare Network Whitepaper](https://flare.network/wp-content/uploads/Flare-White-Paper-v2.pdf)
+- [Flare Developer Hub](https://dev.flare.network/)
+- [Hardhat Starter Kit](https://github.com/flare-foundation/flare-hardhat-starter)
+- [Defending Against Poisoning Attacks in Federated Learning With Blockchain](https://doi.org/10.1109/TAI.2024.3376651)
+
+### Acknowledgements
+I would like to thank the Flare team for all the support and for developing the Flare chain and the Flare Data Connector, as well as organizing the two workshops. I would like to thank the DeSci team for providing me `Peter`, an AI assistant to whom I shared my thoughts and ideas. I would like to thank the ETHOxford Hackathon organizers for organizing this event and for the opportunity to participate. Finally, I would like to thank myself for the hard work, the dedication and the sleep I lost to build this project.

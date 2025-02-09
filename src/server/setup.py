@@ -20,10 +20,10 @@ REQUIRES = [
 setup(
     name=NAME,
     version=VERSION,
-    description="Model Validation API",
+    description="Model Update and Validation API",
     author_email="",
     url="",
-    keywords=["OpenAPI", "Model Validation API"],
+    keywords=["OpenAPI", "Model Update and Validation API"],
     install_requires=REQUIRES,
     packages=find_packages(),
     package_data={'': ['openapi/openapi.yaml']},
@@ -31,7 +31,7 @@ setup(
     entry_points={
         'console_scripts': ['openapi_server=openapi_server.__main__:main']},
     long_description="""\
-    API for validating a model with provided weights
+    API for model updates, validation, and retrieval.
     """
 )
 

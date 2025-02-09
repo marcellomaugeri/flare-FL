@@ -1,30 +1,138 @@
 openapi: 3.0.0
 info:
-  description: API for validating a model with provided weights
-  title: Model Validation API
+  description: "API for model updates, validation, and retrieval."
+  title: Model Update and Validation API
   version: 1.0.0
 servers:
 - url: /
 paths:
-  /validate_model:
+  /get_local_update:
     get:
-      operationId: validate_model_get
+      operationId: get_local_update_get
       parameters:
-      - description: The model architecture
-        explode: true
+      - explode: true
         in: query
-        name: model
+        name: model_id
         required: true
         schema:
-          enum:
-          - cifar10
           type: string
         style: form
-      - description: "The model weights (to overcome the limitation of GET request,\
-          \ this field will receive a file path for now)"
-        explode: true
+      - explode: true
         in: query
-        name: weights
+        name: update_id
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                description: The model weights in hexadecimal format.
+                format: hex
+                type: string
+          description: Success. Returns the model weights as a hex string.
+        "400":
+          description: Bad Request (missing parameters).
+      summary: Get local update weights.
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /global_model:
+    get:
+      operationId: global_model_get
+      parameters:
+      - explode: true
+        in: query
+        name: model_id
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                description: The model weights in hexadecimal format.
+                format: hex
+                type: string
+          description: Success. Returns the global model weights.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_validate_get_400_response'
+          description: Bad Request (missing parameters).
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_global_model_get_404_response'
+          description: Not Found (model ID doesn't exist).
+      summary: Retrieve global model weights.
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /update_model:
+    post:
+      operationId: update_model_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/_update_model_post_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_update_model_post_200_response'
+          description: Success. Returns the update ID (SHA256 hash).
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_update_model_post_400_response'
+          description: Bad Request (invalid input or format).
+      summary: Update model with hex string.
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /update_model_from_file:
+    post:
+      operationId: update_model_from_file_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/_update_model_from_file_post_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_update_model_from_file_post_200_response'
+          description: Success. Returns the update ID (SHA256 hash).
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_update_model_post_400_response'
+          description: Bad Request (file not found or other error).
+      summary: Update model from file.
+      x-openapi-router-controller: openapi_server.controllers.default_controller
+  /validate:
+    get:
+      operationId: validate_get
+      parameters:
+      - explode: true
+        in: query
+        name: model_id
+        required: true
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: update_id
         required: true
         schema:
           type: string
@@ -34,28 +142,126 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/_validate_model_get_200_response'
-          description: Validation result
-      summary: Validate the model with provided weights
+                $ref: '#/components/schemas/_validate_get_200_response'
+          description: Validation successful. Returns model_id and update_id.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_validate_get_400_response'
+          description: Bad Request (missing parameters).
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/_validate_get_409_response'
+          description: Validation failed.
+      summary: Validate model update.
       x-openapi-router-controller: openapi_server.controllers.default_controller
 components:
   schemas:
-    _validate_model_get_200_response:
+    _validate_get_400_response:
       example:
-        model: model
-        weights: weights
         error: error
       properties:
-        model:
-          title: model
-          type: string
-        weights:
-          format: base64
-          title: weights
-          type: string
         error:
-          nullable: true
           title: error
           type: string
-      title: _validate_model_get_200_response
+      title: _validate_get_400_response
+      type: object
+    _validate_get_409_response:
+      example:
+        error: error
+      properties:
+        error:
+          description: Error message.
+          title: error
+          type: string
+      title: _validate_get_409_response
+      type: object
+    _update_model_post_400_response:
+      example:
+        error: error
+      properties:
+        error:
+          description: Description of the error.
+          title: error
+          type: string
+      title: _update_model_post_400_response
+      type: object
+    _update_model_post_200_response:
+      example:
+        update_id: update_id
+      properties:
+        update_id:
+          description: The SHA256 hash of the uploaded weights.
+          title: update_id
+          type: string
+      title: _update_model_post_200_response
+      type: object
+    _global_model_get_404_response:
+      example:
+        error: error
+      properties:
+        error:
+          description: Error message (model not found).
+          title: error
+          type: string
+      title: _global_model_get_404_response
+      type: object
+    _validate_get_200_response:
+      example:
+        update_id: update_id
+        model_id: model_id
+      properties:
+        model_id:
+          description: The model ID.
+          title: model_id
+          type: string
+        update_id:
+          description: The update ID (SHA256 hash).
+          title: update_id
+          type: string
+      title: _validate_get_200_response
+      type: object
+    _update_model_post_request:
+      properties:
+        model_id:
+          enum:
+          - cifar10
+          title: model_id
+          type: string
+        hex_weights:
+          format: hex
+          title: hex_weights
+          type: string
+      required:
+      - hex_weights
+      - model_id
+      title: _update_model_post_request
+      type: object
+    _update_model_from_file_post_200_response:
+      example:
+        update_id: update_id
+      properties:
+        update_id:
+          description: The SHA256 hash of the file contents.
+          title: update_id
+          type: string
+      title: _update_model_from_file_post_200_response
+      type: object
+    _update_model_from_file_post_request:
+      properties:
+        model_id:
+          enum:
+          - cifar10
+          title: model_id
+          type: string
+        file_path:
+          title: file_path
+          type: string
+      required:
+      - file_path
+      - model_id
+      title: _update_model_from_file_post_request
       type: object

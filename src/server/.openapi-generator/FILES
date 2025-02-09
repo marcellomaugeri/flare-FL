@@ -1,5 +1,6 @@
 .dockerignore
 .gitignore
+.openapi-generator-ignore
 .travis.yml
 Dockerfile
 README.md
@@ -12,9 +13,18 @@ openapi_server/controllers/security_controller.py
 openapi_server/encoder.py
 openapi_server/models/__init__.py
 openapi_server/models/base_model.py
-openapi_server/models/validate_model_get200_response.py
+openapi_server/models/global_model_get404_response.py
+openapi_server/models/update_model_from_file_post200_response.py
+openapi_server/models/update_model_from_file_post_request.py
+openapi_server/models/update_model_post200_response.py
+openapi_server/models/update_model_post400_response.py
+openapi_server/models/update_model_post_request.py
+openapi_server/models/validate_get200_response.py
+openapi_server/models/validate_get400_response.py
+openapi_server/models/validate_get409_response.py
 openapi_server/openapi/openapi.yaml
 openapi_server/test/__init__.py
+openapi_server/test/test_default_controller.py
 openapi_server/typing_utils.py
 openapi_server/util.py
 requirements.txt
