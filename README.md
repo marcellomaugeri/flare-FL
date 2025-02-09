@@ -102,10 +102,6 @@ The demo is designed to show how the project works.
 5. Once done, the client will query the Flare chain to get all the model updates and will aggregate them to its local model.
 6. Then, it performs a round of testing to evaluate the performance of the model.
 
-
-TO DO AT THE END -> Embed a youtube video
-
-
 ### To-do list
 - Refactor the server as there is duplicated code (`mlmodels`, `data` and `utils`).
 - Rewrite the tests (they are not working with latest changes).
