@@ -18,6 +18,9 @@ If the request is approved, the model update will be stored on the `Flare` chain
 
 The `TTP` is responsible for storing and maintaining the global model. For the sake of simplicity, currently the global model is fixed and not updated. However, the `TTP` can be extended easily to employ a strategy to update the global model (e.g. FedAvg).
 
+### Workflow
+![Flare-FL Workflow](./img/Workflow.png)
+
 ### Contribution
 
 The contribution of this project is two-fold:
