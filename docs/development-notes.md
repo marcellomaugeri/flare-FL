@@ -39,10 +39,10 @@ npx hardhat run-script --url https://8f18-163-1-81-192.ngrok-free.app --updateid
 
 ### Verify the status of an Attestation Request (get proof)
 ```console
-npx hardhat run-script --url https://8f18-163-1-81-192.ngrok-free.app --updateid 08f3ff0f9b98a5dcc3eb4b2c580da8d7d7e72a588f3813f6e7c87b4dbed24c30 --modelid cifar10 --roundid 896372 --command getProof --network coston
+npx hardhat run-script --url https://8f18-163-1-81-192.ngrok-free.app --updateid 08f3ff0f9b98a5dcc3eb4b2c580da8d7d7e72a588f3813f6e7c87b4dbed24c30 --modelid cifar10 --roundid 896393 --command getProof --network coston
 ```
 
 ### Submit a model update
 ```console
-npx hardhat run-script --url https://8f18-163-1-81-192.ngrok-free.app --updateid 08f3ff0f9b98a5dcc3eb4b2c580da8d7d7e72a588f3813f6e7c87b4dbed24c30 --modelid cifar10 --roundid 896372 --command submitProof --network coston
+npx hardhat run-script --url https://8f18-163-1-81-192.ngrok-free.app --updateid 08f3ff0f9b98a5dcc3eb4b2c580da8d7d7e72a588f3813f6e7c87b4dbed24c30 --modelid cifar10 --roundid 896393 --command submitProof --network coston
 ```
