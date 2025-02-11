@@ -3,6 +3,7 @@ Submission for the `AI track`, `Flare`'s track `1` & `2`, and the `NERDo Awards`
 
 ### Awards 
 - `NERDo Awards` for the `most likely to disrupt` project.
+- `Flare`'s track `1`: pool prize.
 
 ![Flare-FL Logo](./img/Flare-FL.jpg)
 
